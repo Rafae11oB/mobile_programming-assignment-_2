@@ -4,44 +4,45 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.instagramclone.data.repository.impl.NotificationRepositoryImpl
+import com.example.instagramclone.data.repository.impl.PostRepositoryImpl
+import com.example.instagramclone.data.repository.impl.UserRepositoryImpl
+import com.example.instagramclone.domain.services.UserService
+import com.example.instagramclone.domain.services.impl.NotificationServiceImpl
+import com.example.instagramclone.domain.services.impl.PostServiceImpl
+import com.example.instagramclone.domain.services.impl.UserServiceImpl
+import com.example.instagramclone.ui.screens.MainScreen
 import com.example.instagramclone.ui.theme.InstagramCloneTheme
 
 class MainActivity : ComponentActivity() {
+    private val userRepository = UserRepositoryImpl
+    private val postRepository = PostRepositoryImpl
+    private val notificationRepository = NotificationRepositoryImpl
+
+    private val userService = UserServiceImpl(
+        userRepository = userRepository
+    )
+    private val postService = PostServiceImpl(
+        postRepository = postRepository,
+        userRepository = userRepository,
+        notificationRepository = notificationRepository
+    )
+    private val notificationService = NotificationServiceImpl(
+        userRepository = userRepository,
+        notificationRepository = notificationRepository
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             InstagramCloneTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                MainScreen(
+                    userService = userService,
+                    notificationService = notificationService,
+                    postService = postService
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    InstagramCloneTheme {
-        Greeting("Android")
     }
 }
